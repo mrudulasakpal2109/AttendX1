@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX - Student Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+    <div class="background-decor"></div>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <img src="vitlogo.jpg" alt="VIT Logo" style="height: 40px; vertical-align: middle; margin-right: 15px; border-radius: 50%;">
+                <span style="font-size: 1.5rem; font-weight: bold;">Attend<span class="highlight-cyan">X</span></span>
+            </div>
+            <div>
+                <span class="user-badge" id="student-name">Student</span>
+                <a href="index.html" class="log-out" onclick="localStorage.clear()">Log Out</a>
+            </div>
+        </div>
+
+        <div class="grid-content" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <div class="display-panel" style="width: 100%; max-width: 600px;">
+                <h2 style="margin-bottom: 20px;">Scan Attendance QR</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Point your camera at the QR code presented by your professor. You only have 1 minute to scan!</p>
+                
+                <div id="reader"></div>
+
+                <div id="scan-result" style="display: none; margin-top: 20px;">
+                    <h3 class="highlight-cyan" id="success-msg"></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let isProcessing = false;
+
+        function getDeviceId() {
+            let id = localStorage.getItem('device_id');
+            if(!id) {
+                id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2);
+                localStorage.setItem('device_id', id);
+            }
+            return id;
+        }
+
+        window.onload = () => {
+            const roll = localStorage.getItem('student_roll');
+            if(!roll) {
+                window.location.href = 'index.html';
+            }
+            document.getElementById('student-name').innerText = roll;
+            
+            initScanner();
+        }
+
+        function initScanner() {
+            const html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader",
+                { 
+                    fps: 10, 
+                    qrbox: {width: 250, height: 250},
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                },
+                /* verbose= */ false);
+                
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
+
+        async function onScanSuccess(decodedText, decodedResult) {
+            if(isProcessing) return;
+            isProcessing = true;
+            
+            // Assume decodedText is the session_token
+            const sessionToken = decodedText;
+            const rollNumber = localStorage.getItem('student_roll');
+            const deviceId = getDeviceId();
+
+            try {
+                // Pause scanner while processing
+                document.getElementById('reader').style.display = 'none';
+
+                const res = await fetch(`${API_BASE}/student/scan`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_token: sessionToken,
+                        roll_number: rollNumber,
+                        device_id: deviceId
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if(res.ok) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Your attendance has been marked as present.',
+                        icon: 'success',
+                        confirmButtonText: 'Great'
+                    });
+                    
+                    document.getElementById('scan-result').style.display = 'block';
+                    document.getElementById('success-msg').innerText = "Attendance Marked ✅";
+                    
+                } else {
+                    Swal.fire({
+                        title: 'Scanning failed',
+                        text: data.detail || 'Failed to mark attendance',
+                        icon: 'error',
+                        confirmButtonText: 'Try Again'
+                    }).then(() => {
+                        isProcessing = false;
+                        document.getElementById('reader').style.display = 'block';
+                    });
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Network Error. Could not process scan.', 'error').then(() => {
+                    isProcessing = false;
+                    document.getElementById('reader').style.display = 'block';
+                });
+            }
+        }
+
+        function onScanFailure(error) {
+            // Usually simple noise. Ignore.
+            // console.warn(`Code scan error = ${error}`);
+        }
+    </script>
+</body>
+</html>

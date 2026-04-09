@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX - Faculty Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="background-decor"></div>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div>
+                <img src="vitlogo.jpg" alt="VIT Logo" style="height: 40px; vertical-align: middle; margin-right: 15px; border-radius: 50%;">
+                <span style="font-size: 1.5rem; font-weight: bold;">Attend<span class="highlight-cyan">X</span></span>
+            </div>
+            <div>
+                <span class="user-badge" id="faculty-name">Prof. Name</span>
+                <a href="index.html" class="log-out" onclick="localStorage.clear()">Log Out</a>
+            </div>
+        </div>
+
+        <div class="grid-content">
+            <div class="control-panel">
+                <h2 style="margin-bottom: 20px;">Generate Scanner</h2>
+                
+                <div class="input-group">
+                    <label>Select Class</label>
+                    <select id="class-select">
+                        <option value="CMPN A">CMPN A</option>
+                        <option value="CMPN B">CMPN B</option>
+                        <option value="CMPN C">CMPN C</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label>Duration</label>
+                        <select id="duration-select">
+                            <option value="1">1 Hour</option>
+                            <option value="2">2 Hours</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Session Type</label>
+                        <select id="type-select">
+                            <option value="Theory">Theory</option>
+                            <option value="Lab">Lab</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn primary-btn" onclick="generateQR()">Generate QR Code</button>
+                
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 30px 0;">
+
+                <h2 style="margin-bottom: 20px;">Manage Excel</h2>
+                <div class="input-group">
+                    <label>Download Attendance Sheet</label>
+                    <select id="download-class-select">
+                        <option value="CMPN A">CMPN A</option>
+                        <option value="CMPN B">CMPN B</option>
+                        <option value="CMPN C">CMPN C</option>
+                    </select>
+                </div>
+                <button class="btn secondary-btn" onclick="downloadExcel()">Download .xlsx</button>
+            </div>
+
+            <div class="display-panel">
+                <h2 id="qr-status">Ready to Generate</h2>
+                <p id="qr-desc" style="color: var(--text-muted); margin-top: 10px;">Select parameters and hit generate.</p>
+                
+                <div id="qrcode-container" style="background: white; padding: 20px; border-radius: 12px; margin-top: 20px;"></div>
+                
+                <div id="timer" class="timer" style="display: none;">01:00</div>
+            </div>
+        </div>
+    </div>
+
+        const API_BASE = '/api';
+            if(!localStorage.getItem('faculty_user')) {
+                window.location.href = 'index.html';
+            }
+            document.getElementById('faculty-name').innerText = localStorage.getItem('faculty_user');
+        }
+
+        let countdownInterval;
+
+        async function generateQR() {
+            const className = document.getElementById('class-select').value;
+            const duration = document.getElementById('duration-select').value;
+            const sessionType = document.getElementById('type-select').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/faculty/generate_qr`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        class_name: className,
+                        duration: parseInt(duration),
+                        session_type: sessionType
+                    })
+                });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    const token = data.token;
+                    
+                    document.getElementById('qr-status').innerText = 'Scanner Active';
+                    document.getElementById('qr-desc').innerText = `Scan will close in 1 minute. Class: ${className} (${duration}Hr ${sessionType})`;
+                    
+                    const qrContainer = document.getElementById('qrcode-container');
+                    qrContainer.innerHTML = '';
+                    qrContainer.style.display = 'inline-block';
+                    
+                    new QRCode(qrContainer, {
+                        text: token,
+                        width: 256,
+                        height: 256,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    });
+
+                    startTimer(60); // 1 minute limit
+
+                } else {
+                    Swal.fire('Error', data.detail || 'Failed to generate', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Could not connect to server', 'error');
+            }
+        }
+
+        function startTimer(seconds) {
+            clearInterval(countdownInterval);
+            const timerEl = document.getElementById('timer');
+            timerEl.style.display = 'block';
+            let timeLeft = seconds;
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const s = (timeLeft % 60).toString().padStart(2, '0');
+                timerEl.innerText = `${m}:${s}`;
+
+                if(timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    timerEl.innerText = "EXPIRED";
+                    document.getElementById('qr-status').innerText = 'Scanner Closed';
+                    document.getElementById('qrcode-container').innerHTML = '<div class="qr-placeholder">QR EXPIRED</div>';
+                }
+            }, 1000);
+        }
+
+        function downloadExcel() {
+            const className = document.getElementById('download-class-select').value;
+            window.open(`${API_BASE}/faculty/download/${className}`, '_blank');
+        }
+    </script>
+</body>
+</html>

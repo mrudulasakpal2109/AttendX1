@@ -1,0 +1,310 @@
+:root {
+    --bg-dark: #0a0e17;
+    --primary-glow: #00e5ff;
+    --secondary-glow: #7000ff;
+    --text-main: #ffffff;
+    --text-muted: #8b9bb4;
+    --glass-bg: rgba(16, 23, 40, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.background-decor {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--primary-glow) 0%, var(--secondary-glow) 40%, transparent 70%);
+    filter: blur(100px);
+    opacity: 0.15;
+    z-index: 0;
+    animation: pulse 8s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.25; }
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+    z-index: 10;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.college-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-glow);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.highlight-cyan {
+    color: var(--primary-glow);
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.logo-container p {
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.form-section {
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.form-section.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: slideUp 0.4s forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-group input:focus, .input-group select:focus {
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+}
+
+.btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.3s;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, var(--primary-glow), #00b4cc);
+    color: #000;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 229, 255, 0.4);
+}
+
+.secondary-btn {
+    background: linear-gradient(135deg, var(--secondary-glow), #5000c0);
+    color: #fff;
+}
+
+.secondary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(112, 0, 255, 0.4);
+}
+
+.switch-mode {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.switch-mode span {
+    color: var(--primary-glow);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Dashboard specific */
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.user-badge {
+    background: rgba(0, 229, 255, 0.2);
+    color: var(--primary-glow);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid var(--primary-glow);
+}
+
+.grid-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    flex: 1;
+}
+
+.control-panel, .display-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 30px;
+}
+
+.display-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#qrcode-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    display: none;
+}
+
+.qr-placeholder {
+    width: 250px;
+    height: 250px;
+    border: 2px dashed var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-muted);
+}
+
+#reader {
+    width: 100%;
+    max-width: 500px;
+    border: 2px solid var(--primary-glow);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.log-out {
+    color: #ff4757;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    background: rgba(255, 71, 87, 0.1);
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.log-out:hover {
+    background: rgba(255, 71, 87, 0.2);
+}
+
+.timer {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ff4757;
+    margin-top: 20px;
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AttendX - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="background-decor"></div>
+    
+    <div class="login-container glass-panel">
+        <div class="logo-container">
+            <img src="vitlogo.jpg" alt="VIT Logo" class="college-logo">
+            <h1>Attend<span class="highlight-cyan">X</span></h1>
+            <p>Next-Gen Attendance System</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-student" onclick="switchRole('student')">Student</button>
+            <button class="tab-btn" id="tab-faculty" onclick="switchRole('faculty')">Faculty</button>
+        </div>
+
+        <!-- Student Login Form -->
+        <div id="student-login-form" class="form-section active">
+            <div class="input-group">
+                <label>Roll Number</label>
+                <input type="text" id="student-roll-login" placeholder="e.g. 24102A0002" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="student-pass-login" placeholder="Enter password" required>
+            </div>
+            <button class="btn primary-btn" onclick="loginStudent()">Login</button>
+            <p class="switch-mode">New Student? <span onclick="switchMode('student', 'signup')">Sign up here</span></p>
+        </div>
+
+        <!-- Student Signup Form -->
+        <div id="student-signup-form" class="form-section" style="display: none;">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="student-name-signup" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="input-group">
+                <label>Roll Number (Username)</label>
+                <input type="text" id="student-roll-signup" placeholder="e.g. 24102A0002" required>
+            </div>
+            <div class="input-group">
+                <label>New Password</label>
+                <input type="password" id="student-pass-signup" placeholder="Create password" required>
+            </div>
+            <button class="btn primary-btn" onclick="signupStudent()">Create Account</button>
+            <p class="switch-mode">Already have an account? <span onclick="switchMode('student', 'login')">Login here</span></p>
+        </div>
+
+        <!-- Faculty Login Form -->
+        <div id="faculty-login-form" class="form-section" style="display: none;">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="faculty-user-login" placeholder="e.g. prof_smith" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="faculty-pass-login" placeholder="Enter password" required>
+            </div>
+            <button class="btn secondary-btn" onclick="loginFaculty()">Login as Faculty</button>
+            <p class="switch-mode">New Faculty? <span onclick="switchMode('faculty', 'signup')">Sign up here</span></p>
+        </div>
+
+        <!-- Faculty Signup Form -->
+        <div id="faculty-signup-form" class="form-section" style="display: none;">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="faculty-name-signup" placeholder="e.g. Prof Smith" required>
+            </div>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="faculty-user-signup" placeholder="e.g. prof_smith" required>
+            </div>
+            <div class="input-group">
+                <label>New Password</label>
+                <input type="password" id="faculty-pass-signup" placeholder="Create password" required>
+            </div>
+            <button class="btn secondary-btn" onclick="signupFaculty()">Create Account</button>
+            <p class="switch-mode">Already have an account? <span onclick="switchMode('faculty', 'login')">Login here</span></p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
